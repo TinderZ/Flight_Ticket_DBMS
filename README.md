@@ -1,4 +1,4 @@
-# 民航票务管理系统 (Flight Ticket Database Management System)
+# 民航票务管理系统 (Flight Ticket DBMS)
 
 一个基于 Flask + MySQL 开发的民航票务管理信息系统，支持管理员进行航班信息管理和普通用户进行航班查询。
 
