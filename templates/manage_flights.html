@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}航班管理 - 民航票务管理系统{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h2 class="text-white">
+                    <i class="fas fa-cog me-3"></i>航班管理
+                </h2>
+                <p class="text-white-50">管理所有航班信息</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作工具栏 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>航班列表
+                                <span class="badge bg-primary ms-2">{{ flights|length }} 条记录</span>
+                            </h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="{{ url_for('add_flight') }}" class="btn btn-success me-2">
+                                <i class="fas fa-plus me-2"></i>添加航班
+                            </a>
+                            <button class="btn btn-outline-primary" onclick="refreshData()">
+                                <i class="fas fa-sync-alt me-2"></i>刷新
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索和筛选 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>快速筛选
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control search-input" id="quickSearch"
+                                placeholder="搜索航班号、起点、终点...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="statusFilter">
+                                <option value="">所有状态</option>
+                                <option value="available">有余座</option>
+                                <option value="full">已满座</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" class="form-control" id="dateFilter" placeholder="按日期筛选">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="fas fa-eraser me-1"></i>清除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 航班列表 -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if flights %}
+                    <div class="table-responsive">
+                        <table class="table flight-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag me-1"></i>航班号</th>
+                                    <th><i class="fas fa-route me-1"></i>航线</th>
+                                    <th><i class="fas fa-calendar me-1"></i>日期</th>
+                                    <th><i class="fas fa-clock me-1"></i>时间</th>
+                                    <th><i class="fas fa-dollar-sign me-1"></i>价格</th>
+                                    <th><i class="fas fa-chair me-1"></i>座位</th>
+                                    <th><i class="fas fa-building me-1"></i>航空公司</th>
+                                    <th><i class="fas fa-cog me-1"></i>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for flight in flights %}
+                                {% set progress = (flight.RemainingSeats / flight.TotalSeats * 100) if flight.TotalSeats
+                                > 0 else 0 %}
+                                {% set width_style = "width: " + progress|string + "%;" %}
+                                {% if progress > 50 %}
+                                {% set progress_class = "bg-success" %}
+                                {% elif progress > 20 %}
+                                {% set progress_class = "bg-warning" %}
+                                {% else %}
+                                {% set progress_class = "bg-danger" %}
+                                {% endif %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">{{ flight.FlightNumber }}</span>
+                                    </td>
+                                    <td>
+                                        <strong>{{ flight.Origin }}</strong>
+                                        <i class="fas fa-arrow-right mx-2 text-muted"></i>
+                                        <strong>{{ flight.Destination }}</strong>
+                                    </td>
+                                    <td>{{ flight.FlightDate.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="text-center me-2">
+                                                <div class="fw-bold">{{ flight.DepartureTime.strftime('%H:%M') }}</div>
+                                                <small class="text-muted">起飞</small>
+                                            </div>
+                                            <i class="fas fa-arrow-right text-muted"></i>
+                                            <div class="text-center ms-2">
+                                                <div class="fw-bold">{{ flight.ArrivalTime.strftime('%H:%M') }}</div>
+                                                <small class="text-muted">到达</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="h6 text-danger">¥{{ "%.2f"|format(flight.Price) }}</span>
+                                        {% if flight.DiscountedTickets > 0 %}
+                                        <br><small class="text-success">
+                                            <i class="fas fa-tags me-1"></i>{{ flight.DiscountedTickets }}张优惠票
+                                        </small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="progress mb-1" style="height: 8px;">
+                                            <div class="progress-bar {{ progress_class }}" style="{{ width_style }}">
+                                            </div>
+                                        </div>
+                                        <small>
+                                            {% if flight.RemainingSeats > 0 %}
+                                            <span class="badge bg-success">余{{ flight.RemainingSeats }}座</span>
+                                            {% else %}
+                                            <span class="badge bg-danger">已满</span>
+                                            {% endif %}
+                                            / 总{{ flight.TotalSeats }}座
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if flight.AirlineName %}
+                                        <span class="badge bg-info">{{ flight.AirlineName }}</span>
+                                        {% else %}
+                                        <span class="text-muted">未指定</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('edit_flight', flight_id=flight.FlightID) }}"
+                                                class="btn btn-sm btn-warning" title="编辑">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('delete_flight', flight_id=flight.FlightID) }}"
+                                                class="btn btn-sm btn-danger delete-btn" title="删除">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-plane fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">暂无航班信息</h4>
+                        <p class="text-muted">开始添加您的第一个航班</p>
+                        <a href="{{ url_for('add_flight') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus me-2"></i>添加航班
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 刷新数据
+    function refreshData() {
+        showLoading();
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    }
+
+    // 清除筛选条件
+    function clearFilters() {
+        document.getElementById('quickSearch').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('dateFilter').value = '';
+
+        // 显示所有行
+        const rows = document.querySelectorAll('.flight-table tbody tr');
+        rows.forEach(row => {
+            row.style.display = '';
+        });
+    }
+
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', function () {
+        // 搜索功能
+        document.getElementById('quickSearch').addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.flight-table tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // 状态筛选
+        document.getElementById('statusFilter').addEventListener('change', function () {
+            const status = this.value;
+            const rows = document.querySelectorAll('.flight-table tbody tr');
+
+            rows.forEach(row => {
+                if (!status) {
+                    row.style.display = '';
+                    return;
+                }
+
+                const badges = row.querySelectorAll('.badge');
+                let hasStatus = false;
+
+                badges.forEach(badge => {
+                    const text = badge.textContent;
+                    if (status === 'available' && text.includes('余') && !text.includes('已满')) {
+                        hasStatus = true;
+                    } else if (status === 'full' && text.includes('已满')) {
+                        hasStatus = true;
+                    }
+                });
+
+                row.style.display = hasStatus ? '' : 'none';
+            });
+        });
+
+        // 日期筛选
+        document.getElementById('dateFilter').addEventListener('change', function () {
+            const selectedDate = this.value;
+            const rows = document.querySelectorAll('.flight-table tbody tr');
+
+            rows.forEach(row => {
+                if (!selectedDate) {
+                    row.style.display = '';
+                    return;
+                }
+
+                const dateCell = row.cells[2].textContent.trim();
+                row.style.display = dateCell === selectedDate ? '' : 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

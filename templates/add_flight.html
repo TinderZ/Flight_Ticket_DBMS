@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}添加航班 - 民航票务管理系统{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <h2 class="text-white">
+                    <i class="fas fa-plus me-3"></i>添加新航班
+                </h2>
+                <p class="text-white-50">录入航班基本信息</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plane me-2"></i>航班信息
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="addFlightForm" novalidate>
+                        <div class="row g-3">
+                            <!-- 航班号 -->
+                            <div class="col-md-6">
+                                <label for="flight_number" class="form-label">
+                                    <i class="fas fa-hashtag me-2"></i>航班号 <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="flight_number" name="flight_number"
+                                    placeholder="如：CA123" required>
+                                <div class="form-text">格式：两个大写字母 + 3-4位数字</div>
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <!-- 航空公司 -->
+                            <div class="col-md-6">
+                                <label for="airline_id" class="form-label">
+                                    <i class="fas fa-building me-2"></i>航空公司
+                                </label>
+                                <select class="form-select" id="airline_id" name="airline_id">
+                                    <option value="">请选择航空公司</option>
+                                    <option value="1">中国国际航空</option>
+                                    <option value="2">中国南方航空</option>
+                                    <option value="3">中国东方航空</option>
+                                    <option value="4">海南航空</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <!-- 出发地 -->
+                            <div class="col-md-6">
+                                <label for="origin" class="form-label">
+                                    <i class="fas fa-plane-departure me-2"></i>出发地 <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="origin" name="origin"
+                                    placeholder="如：北京首都国际机场" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <!-- 目的地 -->
+                            <div class="col-md-6">
+                                <label for="destination" class="form-label">
+                                    <i class="fas fa-plane-arrival me-2"></i>目的地 <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="destination" name="destination"
+                                    placeholder="如：上海浦东国际机场" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <!-- 航班日期 -->
+                            <div class="col-md-4">
+                                <label for="flight_date" class="form-label">
+                                    <i class="fas fa-calendar me-2"></i>航班日期 <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" class="form-control" id="flight_date" name="flight_date" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <!-- 起飞时间 -->
+                            <div class="col-md-4">
+                                <label for="departure_time" class="form-label">
+                                    <i class="fas fa-clock me-2"></i>起飞时间 <span class="text-danger">*</span>
+                                </label>
+                                <input type="time" class="form-control" id="departure_time" name="departure_time"
+                                    required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <!-- 到达时间 -->
+                            <div class="col-md-4">
+                                <label for="arrival_time" class="form-label">
+                                    <i class="fas fa-clock me-2"></i>到达时间 <span class="text-danger">*</span>
+                                </label>
+                                <input type="time" class="form-control" id="arrival_time" name="arrival_time" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <!-- 票价 -->
+                            <div class="col-md-4">
+                                <label for="price" class="form-label">
+                                    <i class="fas fa-dollar-sign me-2"></i>票价 (元) <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="price" name="price" placeholder="0.00"
+                                    step="0.01" min="0" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <!-- 折扣票数 -->
+                            <div class="col-md-4">
+                                <label for="discounted_tickets" class="form-label">
+                                    <i class="fas fa-tags me-2"></i>折扣票数
+                                </label>
+                                <input type="number" class="form-control" id="discounted_tickets"
+                                    name="discounted_tickets" placeholder="0" min="0" value="0">
+                                <div class="form-text">可选：设置优惠票数量</div>
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <!-- 总座位数 -->
+                            <div class="col-md-4">
+                                <label for="total_seats" class="form-label">
+                                    <i class="fas fa-chair me-2"></i>总座位数 <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="total_seats" name="total_seats"
+                                    placeholder="100" min="1" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+
+                        <!-- 表单操作按钮 -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('manage_flights') }}" class="btn btn-secondary btn-lg">
+                                        <i class="fas fa-arrow-left me-2"></i>返回列表
+                                    </a>
+                                    <div>
+                                        <button type="reset" class="btn btn-outline-secondary btn-lg me-3">
+                                            <i class="fas fa-undo me-2"></i>重置
+                                        </button>
+                                        <button type="submit" class="btn btn-success btn-lg">
+                                            <i class="fas fa-save me-2"></i>保存航班
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 帮助信息 -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>填写说明
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>必填字段：</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>航班号：格式如 CA123</li>
+                                <li><i class="fas fa-check text-success me-2"></i>出发地和目的地</li>
+                                <li><i class="fas fa-check text-success me-2"></i>航班日期和时间</li>
+                                <li><i class="fas fa-check text-success me-2"></i>票价和总座位数</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>注意事项：</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>航班日期不能早于今天</li>
+                                <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>到达时间应晚于起飞时间</li>
+                                <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>票价必须为正数</li>
+                                <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>座位数至少为1</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 设置今天为最小日期
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('flight_date').setAttribute('min', today);
+
+        // 初始化表单验证
+        const form = document.getElementById('addFlightForm');
+
+        // 实时验证
+        form.addEventListener('input', function (e) {
+            validateField(e.target);
+        });
+
+        // 时间逻辑验证
+        const departureTime = document.getElementById('departure_time');
+        const arrivalTime = document.getElementById('arrival_time');
+
+        function validateTimes() {
+            if (departureTime.value && arrivalTime.value) {
+                if (arrivalTime.value <= departureTime.value) {
+                    showFieldError(arrivalTime, '到达时间必须晚于起飞时间');
+                    return false;
+                } else {
+                    clearFieldError(arrivalTime);
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        departureTime.addEventListener('change', validateTimes);
+        arrivalTime.addEventListener('change', validateTimes);
+
+        // 表单提交验证
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            if (validateAllFields() && validateTimes()) {
+                // 显示加载状态
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>正在保存...';
+                submitBtn.disabled = true;
+
+                // 提交表单
+                setTimeout(() => {
+                    this.submit();
+                }, 1000);
+            } else {
+                showNotification('请检查表单中的错误信息', 'danger');
+            }
+        });
+
+        // 重置表单
+        form.addEventListener('reset', function () {
+            // 清除所有错误状态
+            const fields = this.querySelectorAll('.is-invalid');
+            fields.forEach(field => {
+                clearFieldError(field);
+            });
+        });
+    });
+
+    // 验证所有字段
+    function validateAllFields() {
+        const form = document.getElementById('addFlightForm');
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+
+        requiredFields.forEach(field => {
+            if (!validateField(field)) {
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    // 验证单个字段
+    function validateField(field) {
+        const value = field.value.trim();
+        const fieldName = field.name;
+
+        // 清除之前的错误
+        clearFieldError(field);
+
+        // 必填字段验证
+        if (field.hasAttribute('required') && !value) {
+            showFieldError(field, '此字段为必填项');
+            return false;
+        }
+
+        // 特定字段验证
+        switch (fieldName) {
+            case 'flight_number':
+                if (value && !/^[A-Z]{2}\d{3,4}$/.test(value)) {
+                    showFieldError(field, '航班号格式应为：两个大写字母 + 3-4位数字（如：CA123）');
+                    return false;
+                }
+                break;
+
+            case 'price':
+            case 'total_seats':
+            case 'discounted_tickets':
+                if (value && (isNaN(value) || parseFloat(value) < 0)) {
+                    showFieldError(field, '请输入有效的正数');
+                    return false;
+                }
+                if (fieldName === 'total_seats' && value && parseInt(value) < 1) {
+                    showFieldError(field, '座位数至少为1');
+                    return false;
+                }
+                break;
+
+            case 'flight_date':
+                if (value) {
+                    const selectedDate = new Date(value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (selectedDate < today) {
+                        showFieldError(field, '航班日期不能早于今天');
+                        return false;
+                    }
+                }
+                break;
+        }
+
+        return true;
+    }
+
+    // 显示字段错误
+    function showFieldError(field, message) {
+        field.classList.add('is-invalid');
+
+        // 移除之前的错误信息
+        const existingError = field.parentNode.querySelector('.invalid-feedback');
+        if (existingError) {
+            existingError.textContent = message;
+        }
+    }
+
+    // 清除字段错误
+    function clearFieldError(field) {
+        field.classList.remove('is-invalid');
+    }
+
+    // 自动大写航班号
+    document.getElementById('flight_number').addEventListener('input', function () {
+        this.value = this.value.toUpperCase();
+    });
+</script>
+{% endblock %}

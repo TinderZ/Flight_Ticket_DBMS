@@ -1,0 +1,5 @@
+CREATE TABLE Airlines (
+    AirlineID INT PRIMARY KEY AUTO_INCREMENT,
+    AirlineName VARCHAR(255) UNIQUE NOT NULL
+);
+
