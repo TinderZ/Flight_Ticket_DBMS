@@ -48,12 +48,11 @@
 ## 📁 项目结构
 
 ```
-Flight_ticket_DBMS/
+Flight_Ticket_DBMS/
 ├── app.py                 # Flask应用主文件
 ├── README.md              # 项目说明文档
-├── 指导书.txt             # 项目需求文档
-├── error.txt              # 错误日志文件
-├── DB_sql/                # 数据库脚本目录
+├── 指导书_prompt.txt      # 项目需求文档
+├── mysql/                 # 数据库脚本目录
 │   ├── 创建DB.sql         # 数据库创建脚本
 │   ├── 航空公司表.sql     # 航空公司表结构
 │   ├── 航班表.sql         # 航班表结构
@@ -96,22 +95,22 @@ pip install flask mysql-connector-python
 
 #### 3.1 创建数据库
 ```sql
--- 运行 DB_sql/创建DB.sql
+-- 运行 mysql/创建DB.sql
 CREATE DATABASE civil_aviation_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE civil_aviation_db;
 ```
 
 #### 3.2 创建表结构
 按顺序执行以下SQL文件：
-1. `DB_sql/航空公司表.sql` - 创建航空公司表
-2. `DB_sql/航班表.sql` - 创建航班表
-3. `DB_sql/管理员用户.sql` - 创建用户表
+1. `mysql/航空公司表.sql` - 创建航空公司表
+2. `mysql/航班表.sql` - 创建航班表
+3. `mysql/管理员用户.sql` - 创建用户表
 
 #### 3.3 插入示例数据
 ```sql
 -- 可选：运行以下文件插入示例数据
--- DB_sql/航班数据插入.sql
--- DB_sql/添加管理员账号.sql
+-- mysql/航班数据插入.sql
+-- mysql/添加管理员账号.sql
 ```
 
 ### 4. 修改数据库连接配置
